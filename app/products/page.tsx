@@ -68,13 +68,16 @@ export default function ProductsPage() {
       <section className="container mx-auto px-4 py-16 bg-accent/5">
         <h2 className="text-3xl font-bold text-center mb-12">Powerful Admin Dashboard</h2>
         <Card className="p-8">
-          <Image
-            src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2015&q=80"
-            alt="Admin Dashboard Interface"
-            width={1200}
-            height={600}
-            className="w-full rounded-lg shadow-lg"
-          />
+          <div className="relative w-full" style={{ paddingTop: '56.25%' }}>
+            <Image
+              src="/dashboard-1.png"
+              alt="Admin Dashboard Interface"
+              fill
+              className="rounded-lg object-contain"
+              priority
+              quality={100}
+            />
+          </div>
         </Card>
       </section>
 

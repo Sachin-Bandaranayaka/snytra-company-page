@@ -35,7 +35,6 @@ export default function Home() {
       {/* What We Offer */}
       <section className="py-20 bg-white">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center mb-12 text-[#1e1800]">What We Offer</h2>
           <OfferingCardsList />
         </div>
       </section>
