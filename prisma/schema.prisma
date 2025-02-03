@@ -1,0 +1,145 @@
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id            String    @id @default(auto()) @map("_id") @db.ObjectId
+  email         String    @unique
+  name          String?
+  password      String
+  role          Role      @default(STAFF)
+  restaurant    Restaurant? @relation(fields: [restaurantId], references: [id])
+  restaurantId  String?   @db.ObjectId
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@map("users")
+}
+
+model Restaurant {
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  address     String
+  phone       String
+  email       String
+  users       User[]
+  menus       Menu[]
+  orders      Order[]
+  tables      Table[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@map("restaurants")
+}
+
+model Menu {
+  id           String    @id @default(auto()) @map("_id") @db.ObjectId
+  name         String
+  description  String?
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id])
+  restaurantId String    @db.ObjectId
+  categories   Category[]
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@map("menus")
+}
+
+model Category {
+  id           String    @id @default(auto()) @map("_id") @db.ObjectId
+  name         String
+  description  String?
+  menu         Menu      @relation(fields: [menuId], references: [id])
+  menuId       String    @db.ObjectId
+  items        MenuItem[]
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@map("categories")
+}
+
+model MenuItem {
+  id           String    @id @default(auto()) @map("_id") @db.ObjectId
+  name         String
+  description  String?
+  price        Float
+  image        String?
+  category     Category  @relation(fields: [categoryId], references: [id])
+  categoryId   String    @db.ObjectId
+  orderItems   OrderItem[]
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@map("menu_items")
+}
+
+model Table {
+  id           String    @id @default(auto()) @map("_id") @db.ObjectId
+  number       Int
+  capacity     Int
+  status       TableStatus @default(AVAILABLE)
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id])
+  restaurantId String    @db.ObjectId
+  orders       Order[]
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@map("tables")
+}
+
+model Order {
+  id           String    @id @default(auto()) @map("_id") @db.ObjectId
+  status       OrderStatus @default(PENDING)
+  total        Float
+  table        Table     @relation(fields: [tableId], references: [id])
+  tableId      String    @db.ObjectId
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id])
+  restaurantId String    @db.ObjectId
+  items        OrderItem[]
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@map("orders")
+}
+
+model OrderItem {
+  id           String    @id @default(auto()) @map("_id") @db.ObjectId
+  quantity     Int
+  price        Float
+  order        Order     @relation(fields: [orderId], references: [id])
+  orderId      String    @db.ObjectId
+  menuItem     MenuItem  @relation(fields: [menuItemId], references: [id])
+  menuItemId   String    @db.ObjectId
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@map("order_items")
+}
+
+enum Role {
+  ADMIN
+  MANAGER
+  STAFF
+}
+
+enum TableStatus {
+  AVAILABLE
+  OCCUPIED
+  RESERVED
+  MAINTENANCE
+}
+
+enum OrderStatus {
+  PENDING
+  PREPARING
+  READY
+  SERVED
+  COMPLETED
+  CANCELLED
+}
+
