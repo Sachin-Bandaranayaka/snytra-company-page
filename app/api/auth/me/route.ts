@@ -3,6 +3,8 @@ import { cookies } from 'next/headers';
 import { jwtVerify } from 'jose';
 import prisma from '@/lib/prisma';
 
+export const runtime = 'nodejs' // Force Node.js runtime
+
 export async function GET() {
     try {
         const cookieStore = cookies();

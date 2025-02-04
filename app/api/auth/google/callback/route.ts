@@ -2,10 +2,16 @@ import { NextResponse } from "next/server"
 import { OAuth2Client } from "google-auth-library"
 import prisma from "@/lib/prisma"
 
+export const runtime = 'nodejs' // Force Node.js runtime
+
+const CALLBACK_URL = process.env.VERCEL_URL
+    ? `https://${process.env.VERCEL_URL}/api/auth/google/callback`
+    : 'http://localhost:3000/api/auth/google/callback'
+
 const client = new OAuth2Client(
     process.env.GOOGLE_CLIENT_ID,
     process.env.GOOGLE_CLIENT_SECRET,
-    "http://localhost:3000/api/auth/google/callback" // Update this in production
+    CALLBACK_URL
 )
 
 export async function GET(request: Request) {
@@ -14,7 +20,7 @@ export async function GET(request: Request) {
         const code = url.searchParams.get("code")
 
         if (!code) {
-            return NextResponse.redirect("/signup?error=No code provided")
+            return NextResponse.redirect(new URL("/signup?error=No code provided", request.url))
         }
 
         const { tokens } = await client.getToken(code)
@@ -27,7 +33,7 @@ export async function GET(request: Request) {
 
         const payload = ticket.getPayload()
         if (!payload) {
-            return NextResponse.redirect("/signup?error=Invalid token")
+            return NextResponse.redirect(new URL("/signup?error=Invalid token", request.url))
         }
 
         const { email, name } = payload
@@ -63,9 +69,9 @@ export async function GET(request: Request) {
 
         // Here you would typically create a session or JWT token
         // For now, we'll redirect to the dashboard
-        return NextResponse.redirect("/dashboard")
+        return NextResponse.redirect(new URL("/dashboard", request.url))
     } catch (error) {
         console.error("Google callback error:", error)
-        return NextResponse.redirect("/signup?error=Authentication failed")
+        return NextResponse.redirect(new URL("/signup?error=Authentication failed", request.url))
     }
 } 
